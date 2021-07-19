@@ -30,14 +30,14 @@ class Database {
 
 const db = new Database({
     host: "localhost",
-    port: 3306,
+    port: 3301,
     user: "root",
     password: "mervens1997",
     database: "employeeDB"
 });
 
 // Builds complete employee table
-async function showEmployeeSummary() {
+function showEmployeeSummary() {
     console.log(' ');
     await db.query('SELECT e.id, e.first_name AS First_Name, e.last_name AS Last_Name, title AS Title, salary AS Salary, name AS Department, CONCAT(m.first_name, " ", m.last_name) AS Manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role r ON e.role_id = r.id INNER JOIN department d ON r.department_id = d.id', (err, res) => {
         if (err) throw err;
@@ -47,7 +47,7 @@ async function showEmployeeSummary() {
 };
 
 // Builds a table which shows existing roles and their departments
-async function showRoleSummary() {
+function showRoleSummary() {
     console.log(' ');
     await db.query('SELECT r.id, title, salary, name AS department FROM role r LEFT JOIN department d ON department_id = d.id', (err, res) => {
         if (err) throw err;
@@ -57,7 +57,7 @@ async function showRoleSummary() {
 };
 
 // Builds a table which shows existing departments
-async function showDepartments() {
+function showDepartments() {
     console.log(' ');
     await db.query('SELECT id, name AS department FROM department', (err, res) => {
         if (err) throw err;
@@ -67,7 +67,7 @@ async function showDepartments() {
 };
 
 // Called inside inquirers to check that the user isn't just trying to fill spots with empty space
-async function confirmStringInput(input) {
+function confirmStringInput(input) {
     if ((input.trim() != "") && (input.trim().length <= 30)) {
         return true;
     }
@@ -75,7 +75,7 @@ async function confirmStringInput(input) {
 };
 
 // Adds a new employee after asking for name, role, and manager
-async function addEmployee() {
+function addEmployee() {
     let positions = await db.query('SELECT id, title FROM role');
     let managers = await db.query('SELECT id, CONCAT(first_name, " ", last_name) AS Manager FROM employee');
     managers.unshift({ id: null, Manager: "None" });
@@ -115,7 +115,7 @@ async function addEmployee() {
 };
 
 // Removes an employee from the database
-async function removeEmployee() {
+function removeEmployee() {
     let employees = await db.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
     employees.push({ id: null, name: "Cancel" });
 
@@ -137,7 +137,7 @@ async function removeEmployee() {
 };
 
 // Change the employee's manager. Also prevents employee from being their own manager
-async function updateManager() {
+function updateManager() {
     let employees = await db.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
     employees.push({ id: null, name: "Cancel" });
 
@@ -178,7 +178,7 @@ async function updateManager() {
 };
 
 // Updates the selected employee's role
-async function updateEmployeeRole() {
+function updateEmployeeRole() {
     let employees = await db.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
     employees.push({ id: null, name: "Cancel" });
     let roles = await db.query('SELECT id, title FROM role');
@@ -208,7 +208,7 @@ async function updateEmployeeRole() {
 };
 
 // Add a new role to the database
-async function addRole() {
+function addRole() {
     let departments = await db.query('SELECT id, name FROM department');
 
     inquirer.prompt([
@@ -244,7 +244,7 @@ async function addRole() {
 };
 
 // Updates a role on the database
-async function updateRole() {
+function updateRole() {
     let roles = await db.query('SELECT id, title FROM role');
     roles.push({ id: null, title: "Cancel" });
     let departments = await db.query('SELECT id, name FROM department');
@@ -290,7 +290,7 @@ async function updateRole() {
 };
 
 // Remove a role from the database
-async function removeRole() {
+function removeRole() {
     let roles = await db.query('SELECT id, title FROM role');
     roles.push({ id: null, title: "Cancel" });
 
@@ -312,7 +312,7 @@ async function removeRole() {
 };
 
 // Add a new department to the database
-async function addDepartment() {
+function addDepartment() {
     inquirer.prompt([
         {
             name: "depName",
@@ -328,7 +328,7 @@ async function addDepartment() {
 };
 
 // Remove a department from the database
-async function removeDepartment() {
+function removeDepartment() {
     let departments = await db.query('SELECT id, name FROM department');
     departments.push({ id: null, name: "Cancel" });
 
@@ -477,14 +477,7 @@ function runApp() {
     });
 }
 
-// Title screen on app start. Nice ASCII art lol
-console.log("_______  __   __  _______    _______  ______    _______  _______  ___   _  _______  ______\n|       ||  |_|  ||       |  |       ||    _ |  |   _   ||       ||   | | ||       ||    _ |\n|       ||       ||  _____|  |_     _||   | ||  |  |_|  ||       ||   |_| ||    ___||   | ||\n|       ||       || |_____     |   |  |   |_||_ |       ||       ||      _||   |___ |   |_||_ \n|      _||       ||_____  |    |   |  |    __  ||       ||      _||     |_ |    ___||    __  |\n|     |_ | ||_|| | _____| |    |   |  |   |  | ||   _   ||     |_ |    _  ||   |___ |   |  | |\n|_______||_|   |_||_______|    |___|  |___|  |_||__| |__||_______||___| |_||_______||___|  |_|\n\nVersion Almost\n");
+
+console.log("Welcome to the Employee Tracker Application!\n\nVersion 1.01\n");
 
 runApp();
-
-// async function testFunc() {
-//     let employees = await db.query('SELECT * FROM employee');
-//     console.log(employees);
-// }
-
-// testFunc();
