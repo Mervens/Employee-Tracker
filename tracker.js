@@ -73,7 +73,7 @@ function confirmStringInput(input) {
     if ((input.trim() != "") && (input.trim().length <= 30)) {
         return true;
     }
-    return "Invalid input. Please limit your input to 30 characters or less."
+    return "Invalid. Please limit to 30 characters or less."
 };
 
 // Adds a new employee after asking for name, role, and manager
@@ -111,7 +111,7 @@ function addEmployee() {
         let positionDetails = positions.find(obj => obj.title === answers.role);
         let manager = managers.find(obj => obj.Manager === answers.manager);
         db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answers.firstName.trim(), answers.lastName.trim(), positionDetails.id, manager.id]]);
-        console.log("\x1b[32m", `${answers.firstName} was added to the employee database!`);
+        console.log("\x1b[32m", `${answers.firstName} was added to the employee listing!`);
         runApp();
     });
 };
@@ -125,14 +125,14 @@ function removeEmployee() {
         {
             name: "employeeName",
             type: "list",
-            message: "Remove which employee?",
+            message: "Remove which?",
             choices: employees.map(obj => obj.name)
         }
     ]).then(response => {
         if (response.employeeName != "Cancel") {
             let unluckyEmployee = employees.find(obj => obj.name === response.employeeName);
             db.query("DELETE FROM employee WHERE id=?", unluckyEmployee.id);
-            console.log("\x1b[32m", `${response.employeeName} was let go...`);
+            console.log("\x1b[32m", `${response.employeeName} has been removed.`);
         }
         runApp();
     })
@@ -173,7 +173,7 @@ function updateManager() {
             let empID = employees.find(obj => obj.name === employeeInfo.empName).id
             let mgID = managers.find(obj => obj.name === managerInfo.mgName).id
             db.query("UPDATE employee SET manager_id=? WHERE id=?", [mgID, empID]);
-            console.log("\x1b[32m", `${employeeInfo.empName} now reports to ${managerInfo.mgName}`);
+            console.log("\x1b[32m", `${employeeInfo.empName} now works under ${managerInfo.mgName}`);
             runApp();
         })
     })
@@ -441,7 +441,6 @@ function editDepartmentOptions() {
     })
 };
 
-// Main interface loop. Called after pretty much every function completes
 function runApp() {
     inquirer.prompt({
         name: "mainmenu",
@@ -478,7 +477,6 @@ function runApp() {
         }
     });
 }
-
 
 console.log("Welcome to the Employee Tracker Application!\n\nVersion 1.01\n");
 
