@@ -2,6 +2,14 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 
+const db = new Database({
+    host: "localhost",
+    port: 3301,
+    user: "root",
+    password: "mervens1997",
+    database: "employeeDB"
+});
+
 class Database {
     constructor(config) {
         this.connection = mysql.createConnection(config);
@@ -28,13 +36,7 @@ class Database {
     }
 }
 
-const db = new Database({
-    host: "localhost",
-    port: 3301,
-    user: "root",
-    password: "mervens1997",
-    database: "employeeDB"
-});
+
 
 // Builds complete employee table
 function showEmployeeSummary() {
