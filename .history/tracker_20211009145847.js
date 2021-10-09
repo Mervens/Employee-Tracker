@@ -49,7 +49,7 @@ function mainMenu() {
 
 // Builds complete employee table
 function showEmployeeList() {
-  var query = `SELECT * from employee`;
+  var query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department,role.salary, CONCAT (manager.first_name, " ", manager.last_name) AS managerFROM employeeLEFT JOIN role ON employee.role_id = role.idLEFT JOIN department ON role.department_id = department.idLEFT JOIN employee manager ON employee.manager_id = manager.id`;
   connect.query(query, function (err, res) {
     console.table(res);
     mainMenu();

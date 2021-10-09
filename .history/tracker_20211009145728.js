@@ -49,7 +49,7 @@ function mainMenu() {
 
 // Builds complete employee table
 function showEmployeeList() {
-  var query = `SELECT * from employee`;
+  var query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department,role.salary, CONCAT (manager.first_name, " ", manager.last_name) AS managerFROM employeeLEFT JOIN role ON employee.role_id = role.idLEFT JOIN department ON role.department_id = department.idLEFT JOIN employee manager ON employee.manager_id = manager.id`;
   connect.query(query, function (err, res) {
     console.table(res);
     mainMenu();
@@ -111,6 +111,9 @@ function addEmployee() {
 
 // Removes an employee from the database
 function removeEmployee() {
+    let employees =  connect.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
+    employees.push({ id: null, name: "Cancel" });
+
     inquirer.prompt([
         {
             name: "employeeName",
@@ -130,6 +133,8 @@ function removeEmployee() {
 
 // Change the employee's manager. Also prevents employee from being their own manager
 function updateManager() {
+    let employees = connect.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
+    employees.push({ id: null, name: "Cancel" });
 
     inquirer.prompt([
         {
@@ -169,6 +174,10 @@ function updateManager() {
 
 // Updates the selected employee's role
 function updateEmployeeRole() {
+    let employees =  connect.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
+    employees.push({ id: null, name: "Cancel" });
+    let roles =  connect.query('SELECT id, title FROM role');
+
     inquirer.prompt([
         {
             name: "empName",
@@ -195,6 +204,8 @@ function updateEmployeeRole() {
 
 // Add a new role to the database
 function addRole() {
+    let departments =  connect.query('SELECT id, name FROM department');
+
     inquirer.prompt([
         {
             name: "roleName",
@@ -229,6 +240,10 @@ function addRole() {
 
 // Updates a role on the database
 function updateRole() {
+    let roles =  connect.query('SELECT id, title FROM role');
+    roles.push({ id: null, title: "Cancel" });
+    let departments =  connect.query('SELECT id, name FROM department');
+
     inquirer.prompt([
         {
             name: "roleName",
@@ -271,6 +286,8 @@ function updateRole() {
 
 // Remove a role from the database
 function removeRole() {
+    let roles =  connect.query('SELECT id, title FROM role');
+    roles.push({ id: null, title: "Cancel" });
 
     inquirer.prompt([
         {
@@ -307,6 +324,8 @@ function addDepartment() {
 
 // Remove a department from the database
 function removeDepartment() {
+    let departments =  connect.query('SELECT id, name FROM department');
+    departments.push({ id: null, name: "Cancel" });
 
     inquirer.prompt([
         {
