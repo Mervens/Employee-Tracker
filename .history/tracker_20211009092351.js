@@ -10,7 +10,7 @@ var connect = mysql.createConnection({
     database: "employeeDB"
 });
 
-function mainMenu() {
+function runApp() {
     inquirer.prompt({
         name: "mainMenu",
         type: "list",
@@ -50,7 +50,7 @@ function mainMenu() {
 // Builds complete employee table
 function showEmployeeList() {
   var query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department,role.salary, CONCAT (manager.first_name, " ", manager.last_name) AS managerFROM employeeLEFT JOIN role ON employee.role_id = role.idLEFT JOIN department ON role.department_id = department.idLEFT JOIN employee manager ON employee.manager_id = manager.id`;
-  connect.query(query, function (err, res) {
+  connection.query(query, function (err, res) {
     console.table(res);
     mainMenu();
   });
@@ -59,7 +59,7 @@ function showEmployeeList() {
 function showRoleList() {
     console.log(' ');
     var query = "SELECT * FROM role"
-    connect.query(query, function (err, res) {
+    connection.query(query, function (err, res) {
       console.table(res);
       mainMenu();
     });
@@ -68,10 +68,10 @@ function showRoleList() {
 // Builds a table which shows existing departments
 function showDepartmentList() {
     console.log(' ');
-     connect.query('SELECT id, name AS department FROM department', (err, res) => {
+    await connect.query('SELECT id, name AS department FROM department', (err, res) => {
         if (err) throw err;
         console.table(res);
-        mainMenu();
+        runApp();
     })
 };
 
@@ -105,13 +105,13 @@ function addEmployee() {
         let manager = managers.find(obj => obj.Manager === answers.manager);
         connect.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answers.firstName.trim(), answers.lastName.trim(), positionDetails.id, manager.id]]);
         console.log("\x1b[32m", `${answers.firstName} was added to the employee listing!`);
-        mainMenu();
+        runApp();
     });
 };
 
 // Removes an employee from the database
 function removeEmployee() {
-    let employees =  connect.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
+    let employees = await connect.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
     employees.push({ id: null, name: "Cancel" });
 
     inquirer.prompt([
@@ -123,17 +123,17 @@ function removeEmployee() {
         }
     ]).then(response => {
         if (response.employeeName != "Cancel") {
-            let sadEmployee = employees.find(obj => obj.name === response.employeeName);
-            connect.query("DELETE FROM employee WHERE id=?", sadEmployee.id);
+            let unluckyEmployee = employees.find(obj => obj.name === response.employeeName);
+            connect.query("DELETE FROM employee WHERE id=?", unluckyEmployee.id);
             console.log("\x1b[32m", `${response.employeeName} has been removed.`);
         }
-        mainMenu();
+        runApp();
     })
 };
 
 // Change the employee's manager. Also prevents employee from being their own manager
 function updateManager() {
-    let employees = connect.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
+    let employees = await connect.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
     employees.push({ id: null, name: "Cancel" });
 
     inquirer.prompt([
@@ -145,7 +145,7 @@ function updateManager() {
         }
     ]).then(employeeInfo => {
         if (employeeInfo.empName == "Cancel") {
-            mainMenu();
+            runApp();
             return;
         }
         let managers = employees.filter(currEmployee => currEmployee.name != employeeInfo.empName);
@@ -167,16 +167,16 @@ function updateManager() {
             let mgID = managers.find(obj => obj.name === managerInfo.mgName).id
             connect.query("UPDATE employee SET manager_id=? WHERE id=?", [mgID, empID]);
             console.log("\x1b[32m", `${employeeInfo.empName} now works under ${managerInfo.mgName}`);
-            mainMenu();
+            runApp();
         })
     })
 };
 
 // Updates the selected employee's role
 function updateEmployeeRole() {
-    let employees =  connect.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
+    let employees = await connect.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
     employees.push({ id: null, name: "Cancel" });
-    let roles =  connect.query('SELECT id, title FROM role');
+    let roles = await connect.query('SELECT id, title FROM role');
 
     inquirer.prompt([
         {
@@ -198,13 +198,13 @@ function updateEmployeeRole() {
             connect.query("UPDATE employee SET role_id=? WHERE id=?", [roleID, empID]);
             console.log("\x1b[32m", `${answers.empName} new role is ${answers.newRole}`);
         }
-        mainMenu();
+        runApp();
     })
 };
 
 // Add a new role to the database
 function addRole() {
-    let departments =  connect.query('SELECT id, name FROM department');
+    let departments = await connect.query('SELECT id, name FROM department');
 
     inquirer.prompt([
         {
@@ -234,15 +234,15 @@ function addRole() {
         let depID = departments.find(obj => obj.name === answers.roleDepartment).id
         connect.query("INSERT INTO role (title, salary, department_id) VALUES (?)", [[answers.roleName, answers.salaryNum, depID]]);
         console.log("\x1b[32m", `${answers.roleName} was added. Department: ${answers.roleDepartment}`);
-        mainMenu();
+        runApp();
     })
 };
 
 // Updates a role on the database
 function updateRole() {
-    let roles =  connect.query('SELECT id, title FROM role');
+    let roles = await connect.query('SELECT id, title FROM role');
     roles.push({ id: null, title: "Cancel" });
-    let departments =  connect.query('SELECT id, name FROM department');
+    let departments = await connect.query('SELECT id, name FROM department');
 
     inquirer.prompt([
         {
@@ -253,7 +253,7 @@ function updateRole() {
         }
     ]).then(response => {
         if (response.roleName == "Cancel") {
-            mainMenu();
+            runApp();
             return;
         }
         inquirer.prompt([
@@ -279,14 +279,14 @@ function updateRole() {
             let roleID = roles.find(obj => obj.title === response.roleName).id
             connect.query("UPDATE role SET title=?, salary=?, department_id=? WHERE id=?", [response.roleName, answers.salaryNum, depID, roleID]);
             console.log("\x1b[32m", `${response.roleName} was updated.`);
-            mainMenu();
+            runApp();
         })
     })
 };
 
 // Remove a role from the database
 function removeRole() {
-    let roles =  connect.query('SELECT id, title FROM role');
+    let roles = await connect.query('SELECT id, title FROM role');
     roles.push({ id: null, title: "Cancel" });
 
     inquirer.prompt([
@@ -302,7 +302,7 @@ function removeRole() {
             connect.query("DELETE FROM role WHERE id=?", noMoreRole.id);
             console.log("\x1b[32m", `${response.roleName} was removed. Please reassign associated employees.`);
         }
-        mainMenu();
+        runApp();
     })
 };
 
@@ -318,13 +318,13 @@ function addDepartment() {
     ]).then(answers => {
         connect.query("INSERT INTO department (name) VALUES (?)", [answers.depName]);
         console.log("\x1b[32m", `${answers.depName} was added to department list.`);
-        mainMenu();
+        runApp();
     })
 };
 
 // Remove a department from the database
 function removeDepartment() {
-    let departments =  connect.query('SELECT id, name FROM department');
+    let departments = await connect.query('SELECT id, name FROM department');
     departments.push({ id: null, name: "Cancel" });
 
     inquirer.prompt([
@@ -340,7 +340,7 @@ function removeDepartment() {
             connect.query("DELETE FROM department WHERE id=?", uselessDepartment.id);
             console.log("\x1b[32m", `${response.depName} was removed. Please reassign associated roles.`);
         }
-        mainMenu();
+        runApp();
     })
 };
 
@@ -372,7 +372,7 @@ function editEmployeeOptions() {
                 removeEmployee();
                 break;
             case "Return To Main Menu":
-                mainMenu();
+                runApp();
                 break;
         }
     })
@@ -402,7 +402,7 @@ function editRoleOptions() {
                 removeRole();
                 break;
             case "Return To Main Menu":
-                mainMenu();
+                runApp();
                 break;
         }
     })
@@ -428,7 +428,7 @@ function editDepartmentOptions() {
                 removeDepartment();
                 break;
             case "Return To Main Menu":
-                mainMenu();
+                runApp();
                 break;
         }
     })
@@ -438,4 +438,4 @@ function editDepartmentOptions() {
 
 console.log("Welcome to the Employee Tracker Application!\n\nVersion 1.01\n");
 
-mainMenu();
+runApp();

@@ -10,7 +10,7 @@ var connect = mysql.createConnection({
     database: "employeeDB"
 });
 
-function mainMenu() {
+function runApp() {
     inquirer.prompt({
         name: "mainMenu",
         type: "list",
@@ -71,7 +71,7 @@ function showDepartmentList() {
      connect.query('SELECT id, name AS department FROM department', (err, res) => {
         if (err) throw err;
         console.table(res);
-        mainMenu();
+        runApp();
     })
 };
 
@@ -105,7 +105,7 @@ function addEmployee() {
         let manager = managers.find(obj => obj.Manager === answers.manager);
         connect.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answers.firstName.trim(), answers.lastName.trim(), positionDetails.id, manager.id]]);
         console.log("\x1b[32m", `${answers.firstName} was added to the employee listing!`);
-        mainMenu();
+        runApp();
     });
 };
 
@@ -127,7 +127,7 @@ function removeEmployee() {
             connect.query("DELETE FROM employee WHERE id=?", sadEmployee.id);
             console.log("\x1b[32m", `${response.employeeName} has been removed.`);
         }
-        mainMenu();
+        runApp();
     })
 };
 
@@ -145,7 +145,7 @@ function updateManager() {
         }
     ]).then(employeeInfo => {
         if (employeeInfo.empName == "Cancel") {
-            mainMenu();
+            runApp();
             return;
         }
         let managers = employees.filter(currEmployee => currEmployee.name != employeeInfo.empName);
@@ -167,7 +167,7 @@ function updateManager() {
             let mgID = managers.find(obj => obj.name === managerInfo.mgName).id
             connect.query("UPDATE employee SET manager_id=? WHERE id=?", [mgID, empID]);
             console.log("\x1b[32m", `${employeeInfo.empName} now works under ${managerInfo.mgName}`);
-            mainMenu();
+            runApp();
         })
     })
 };
@@ -198,7 +198,7 @@ function updateEmployeeRole() {
             connect.query("UPDATE employee SET role_id=? WHERE id=?", [roleID, empID]);
             console.log("\x1b[32m", `${answers.empName} new role is ${answers.newRole}`);
         }
-        mainMenu();
+        runApp();
     })
 };
 
@@ -234,7 +234,7 @@ function addRole() {
         let depID = departments.find(obj => obj.name === answers.roleDepartment).id
         connect.query("INSERT INTO role (title, salary, department_id) VALUES (?)", [[answers.roleName, answers.salaryNum, depID]]);
         console.log("\x1b[32m", `${answers.roleName} was added. Department: ${answers.roleDepartment}`);
-        mainMenu();
+        runApp();
     })
 };
 
@@ -253,7 +253,7 @@ function updateRole() {
         }
     ]).then(response => {
         if (response.roleName == "Cancel") {
-            mainMenu();
+            runApp();
             return;
         }
         inquirer.prompt([
@@ -279,7 +279,7 @@ function updateRole() {
             let roleID = roles.find(obj => obj.title === response.roleName).id
             connect.query("UPDATE role SET title=?, salary=?, department_id=? WHERE id=?", [response.roleName, answers.salaryNum, depID, roleID]);
             console.log("\x1b[32m", `${response.roleName} was updated.`);
-            mainMenu();
+            runApp();
         })
     })
 };
@@ -302,7 +302,7 @@ function removeRole() {
             connect.query("DELETE FROM role WHERE id=?", noMoreRole.id);
             console.log("\x1b[32m", `${response.roleName} was removed. Please reassign associated employees.`);
         }
-        mainMenu();
+        runApp();
     })
 };
 
@@ -318,7 +318,7 @@ function addDepartment() {
     ]).then(answers => {
         connect.query("INSERT INTO department (name) VALUES (?)", [answers.depName]);
         console.log("\x1b[32m", `${answers.depName} was added to department list.`);
-        mainMenu();
+        runApp();
     })
 };
 
@@ -340,7 +340,7 @@ function removeDepartment() {
             connect.query("DELETE FROM department WHERE id=?", uselessDepartment.id);
             console.log("\x1b[32m", `${response.depName} was removed. Please reassign associated roles.`);
         }
-        mainMenu();
+        runApp();
     })
 };
 
@@ -372,7 +372,7 @@ function editEmployeeOptions() {
                 removeEmployee();
                 break;
             case "Return To Main Menu":
-                mainMenu();
+                runApp();
                 break;
         }
     })
@@ -402,7 +402,7 @@ function editRoleOptions() {
                 removeRole();
                 break;
             case "Return To Main Menu":
-                mainMenu();
+                runApp();
                 break;
         }
     })
@@ -428,7 +428,7 @@ function editDepartmentOptions() {
                 removeDepartment();
                 break;
             case "Return To Main Menu":
-                mainMenu();
+                runApp();
                 break;
         }
     })
@@ -438,4 +438,4 @@ function editDepartmentOptions() {
 
 console.log("Welcome to the Employee Tracker Application!\n\nVersion 1.01\n");
 
-mainMenu();
+runApp();
