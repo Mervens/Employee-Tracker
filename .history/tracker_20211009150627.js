@@ -102,7 +102,7 @@ function addEmployee() {
         }
     ]).then(answers => {
         let positionDetails = positions.find(obj => obj.title === answers.role);
-        let manager = manager.find(obj => obj.Manager === answers.manager);
+        let manager = managers.find(obj => obj.Manager === answers.manager);
         connect.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answers.firstName.trim(), answers.lastName.trim(), positionDetails.id, manager.id]]);
         console.log("\x1b[32m", `${answers.firstName} was added to the employee listing!`);
         mainMenu();
@@ -136,17 +136,17 @@ function updateManager() {
             name: "empName",
             type: "list",
             message: "For which employee?",
-            choices: employee.map(obj => obj.name)
+            choices: employees.map(obj => obj.name)
         }
     ]).then(employeeInfo => {
         if (employeeInfo.empName == "Cancel") {
             mainMenu();
             return;
         }
-        let manager = employee.filter(currEmployee => currEmployee.name != employeeInfo.empName);
-        for (i in manager) {
-            if (manager[i].name === "Cancel") {
-                manager[i].name = "None";
+        let managers = employees.filter(currEmployee => currEmployee.name != employeeInfo.empName);
+        for (i in managers) {
+            if (managers[i].name === "Cancel") {
+                managers[i].name = "None";
             }
         };
 
@@ -155,11 +155,11 @@ function updateManager() {
                 name: "mgName",
                 type: "list",
                 message: "Change their manager to:",
-                choices: manager.map(obj => obj.name)
+                choices: managers.map(obj => obj.name)
             }
         ]).then(managerInfo => {
-            let empID = employee.find(obj => obj.name === employeeInfo.empName).id
-            let mgID = manager.find(obj => obj.name === managerInfo.mgName).id
+            let empID = employees.find(obj => obj.name === employeeInfo.empName).id
+            let mgID = managers.find(obj => obj.name === managerInfo.mgName).id
             connect.query("UPDATE employee SET manager_id=? WHERE id=?", [mgID, empID]);
             console.log("\x1b[32m", `${employeeInfo.empName} now works under ${managerInfo.mgName}`);
             mainMenu();

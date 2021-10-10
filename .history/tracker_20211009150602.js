@@ -16,25 +16,25 @@ function mainMenu() {
         type: "list",
         message: "What would you like to do?",
         choices: [
-            "View All Employees",
+            "View All employee",
             "Edit Employee Info",
-            "View Roles",
-            "Edit Roles",
+            "View role",
+            "Edit role",
             "View Departments",
             "Edit Departments"
         ]
     }).then(responses => {
         switch (responses.mainMenu) {
-            case "View All Employees":
+            case "View All employee":
                 showEmployeeList();
                 break;
             case "Edit Employee Info":
                 editEmployeeOptions();
                 break;
-            case "View Roles":
+            case "View role":
                 showRoleList();
                 break;
-            case "Edit Roles":
+            case "Edit role":
                 editRoleOptions();
                 break;
             case "View Departments":
@@ -55,7 +55,7 @@ function showEmployeeList() {
     mainMenu();
   });
 }
-// Builds a table which shows existing roles and their departments
+// Builds a table which shows existing role and their departments
 function showRoleList() {
     console.log(' ');
     var query = "SELECT * FROM role"
@@ -102,7 +102,7 @@ function addEmployee() {
         }
     ]).then(answers => {
         let positionDetails = positions.find(obj => obj.title === answers.role);
-        let manager = manager.find(obj => obj.Manager === answers.manager);
+        let manager = managers.find(obj => obj.Manager === answers.manager);
         connect.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answers.firstName.trim(), answers.lastName.trim(), positionDetails.id, manager.id]]);
         console.log("\x1b[32m", `${answers.firstName} was added to the employee listing!`);
         mainMenu();
@@ -116,11 +116,11 @@ function removeEmployee() {
             name: "employeeName",
             type: "list",
             message: "Remove which employee?",
-            choices: employees.map(obj => obj.name)
+            choices: employee.map(obj => obj.name)
         }
     ]).then(response => {
         if (response.employeeName != "Cancel") {
-            let sadEmployee = employees.find(obj => obj.name === response.employeeName);
+            let sadEmployee = employee.find(obj => obj.name === response.employeeName);
             connect.query("DELETE FROM employee WHERE id=?", sadEmployee.id);
             console.log("\x1b[32m", `${response.employeeName} has been removed.`);
         }
@@ -143,10 +143,10 @@ function updateManager() {
             mainMenu();
             return;
         }
-        let manager = employee.filter(currEmployee => currEmployee.name != employeeInfo.empName);
-        for (i in manager) {
-            if (manager[i].name === "Cancel") {
-                manager[i].name = "None";
+        let managers = employee.filter(currEmployee => currEmployee.name != employeeInfo.empName);
+        for (i in managers) {
+            if (managers[i].name === "Cancel") {
+                managers[i].name = "None";
             }
         };
 
@@ -155,11 +155,11 @@ function updateManager() {
                 name: "mgName",
                 type: "list",
                 message: "Change their manager to:",
-                choices: manager.map(obj => obj.name)
+                choices: managers.map(obj => obj.name)
             }
         ]).then(managerInfo => {
             let empID = employee.find(obj => obj.name === employeeInfo.empName).id
-            let mgID = manager.find(obj => obj.name === managerInfo.mgName).id
+            let mgID = managers.find(obj => obj.name === managerInfo.mgName).id
             connect.query("UPDATE employee SET manager_id=? WHERE id=?", [mgID, empID]);
             console.log("\x1b[32m", `${employeeInfo.empName} now works under ${managerInfo.mgName}`);
             mainMenu();
@@ -234,7 +234,7 @@ function updateRole() {
             name: "roleName",
             type: "list",
             message: "Update which role?",
-            choices: roles.map(obj => obj.title)
+            choices: role.map(obj => obj.title)
         }
     ]).then(response => {
         if (response.roleName == "Cancel") {
@@ -261,7 +261,7 @@ function updateRole() {
             }
         ]).then(answers => {
             let depID = departments.find(obj => obj.name === answers.roleDepartment).id
-            let roleID = roles.find(obj => obj.title === response.roleName).id
+            let roleID = role.find(obj => obj.title === response.roleName).id
             connect.query("UPDATE role SET title=?, salary=?, department_id=? WHERE id=?", [response.roleName, answers.salaryNum, depID, roleID]);
             console.log("\x1b[32m", `${response.roleName} was updated.`);
             mainMenu();
@@ -277,13 +277,13 @@ function removeRole() {
             name: "roleName",
             type: "list",
             message: "Remove which role?",
-            choices: roles.map(obj => obj.title)
+            choices: role.map(obj => obj.title)
         }
     ]).then(response => {
         if (response.roleName != "Cancel") {
-            let noMoreRole = roles.find(obj => obj.title === response.roleName);
+            let noMoreRole = role.find(obj => obj.title === response.roleName);
             connect.query("DELETE FROM role WHERE id=?", noMoreRole.id);
-            console.log("\x1b[32m", `${response.roleName} was removed. Please reassign associated employees.`);
+            console.log("\x1b[32m", `${response.roleName} was removed. Please reassign associated employee.`);
         }
         mainMenu();
     })
@@ -319,13 +319,13 @@ function removeDepartment() {
         if (response.depName != "Cancel") {
             let uselessDepartment = departments.find(obj => obj.name === response.depName);
             connect.query("DELETE FROM department WHERE id=?", uselessDepartment.id);
-            console.log("\x1b[32m", `${response.depName} was removed. Please reassign associated roles.`);
+            console.log("\x1b[32m", `${response.depName} was removed. Please reassign associated role.`);
         }
         mainMenu();
     })
 };
 
-// Options to make changes to employees specifically
+// Options to make changes to employee specifically
 function editEmployeeOptions() {
     inquirer.prompt({
         name: "editChoice",
@@ -359,10 +359,10 @@ function editEmployeeOptions() {
     })
 };
 
-// Options to make changes to roles
+// Options to make changes to role
 function editRoleOptions() {
     inquirer.prompt({
-        name: "editRoles",
+        name: "editrole",
         type: "list",
         message: "What would you like to update?",
         choices: [
@@ -372,7 +372,7 @@ function editRoleOptions() {
             "Return To Main Menu"
         ]
     }).then(responses => {
-        switch (responses.editRoles) {
+        switch (responses.editrole) {
             case "Add A New Role":
                 addRole();
                 break;
