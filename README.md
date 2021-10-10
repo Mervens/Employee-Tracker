@@ -37,10 +37,11 @@ This assignment was to use SQL to create the database for a collection of Employ
 
 `node tracker.js`
 
-## Example
-![EmployeeT]()
-![EmployeeT2](https://user-images.githubusercontent.com/82620500/132426155-6b66c82a-446f-4351-9a80-a5b35e90a0ad.gif)
-![EmployeeT3]
+## Example!
+
+![EmployeeT](https://user-images.githubusercontent.com/82620500/136680007-07b30b2a-c1d1-400c-bb81-ee83acccfbb0.png)
+![EmployeeT2](https://user-images.githubusercontent.com/82620500/136680008-f49633b7-6502-415d-97c0-10a8797c157e.png)
+![EmployeeT3](https://user-images.githubusercontent.com/82620500/136680011-dc61d7cb-698b-4f2d-a4bf-bf7cd25b61f5.png)
 
 ## Shareable link to this repo:  
 
